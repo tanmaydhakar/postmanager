@@ -5,7 +5,14 @@
     "database": "smpm_development",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "server_port": 5002
+    "server_port": 5002,
+    "email_host": "smtp.gmail.com",
+    "email_port": 587,
+    "email_service": "gmail",
+    "email_secure": false,
+    "email_id": "",
+    "email_pass": "",
+    "email_from": "Postmanager"
   },
   "test": {
     "username": "root",
@@ -13,7 +20,14 @@
     "database": "smpm_test",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "server_port": 5002
+    "server_port": 5002,
+    "email_host": "",
+    "email_port": "",
+    "email_service": "",
+    "email_secure": "",
+    "email_id": "",
+    "email_pass": "",
+    "email_from": "Postmanager"
   },
   "production": {
     "username": "root",
@@ -21,6 +35,13 @@
     "database": "smpm_production",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "server_port": 5002
+    "server_port": 5002,
+    "email_host": "",
+    "email_port": "",
+    "email_service": "",
+    "email_secure": "",
+    "email_id": "",
+    "email_pass": "",
+    "email_from": "Postmanager"
   }
 }
