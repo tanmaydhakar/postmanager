@@ -1,7 +1,7 @@
 const path = require('path');
 const bcrypt = require('bcrypt');
 
-const db = require(path.resolve('./models/index'));
+const db = require(path.resolve('./models'));
 const errorHandler = require(path.resolve('./utilities/errorHandler'));
 const err = new Error();
 const { User } = db;

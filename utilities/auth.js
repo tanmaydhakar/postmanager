@@ -1,6 +1,6 @@
 const path = require('path');
 
-const db = require(path.resolve('./models/index'));
+const db = require(path.resolve('./models'));
 const { User } = db;
 
 const verifyToken = async function (req, res, next) {
