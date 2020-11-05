@@ -1,9 +1,10 @@
 const path = require('path');
-const db = require(path.resolve('./models/index'));
-const auth = require(path.resolve('./utilities/auth'));
+const bcrypt = require('bcrypt');
 
+const db = require(path.resolve('./models/index'));
+const errorHandler = require(path.resolve('./utilities/errorHandler'));
 const err = new Error();
-const User = db.User;
+const { User } = db;
 
 const register = async function (req, res) {
   try {
@@ -11,11 +12,10 @@ const register = async function (req, res) {
     user.username = req.body.username;
     user.email = req.body.email;
     user.password = req.body.password;
-    user.save();
-
+    await user.save();
     return res.status(200).json({ user });
   } catch (error) {
-    const errorResponse = errorHandler.getErrorMsg(error);
+    const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
   }
 };
@@ -28,27 +28,27 @@ const login = async function (req, res) {
     const user = await User.findBySpecificField(field);
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) {
-      err.statusCode(400);
+      err.statusCode = 400;
       err.message = 'Invalid username or password';
       throw err;
     } else {
       const token = await User.generateAuthToken();
-      user.tokens.push(token);
-      user.save();
+      await User.addAuthToken('append', token, user.username);
       return res.status(200).json({ token });
     }
   } catch (error) {
-    const errorResponse = errorHandler.getErrorMsg(error);
+    const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
   }
 };
 
 const logout = async function (req, res) {
   try {
-    await auth.revokeToken(req);
+    const token = req.headers.authorization.split(' ')[1];
+    await User.addAuthToken('remove', token, req.user.username);
     return res.status(200).json({ status: 'User loggedout successfully' });
   } catch (error) {
-    const errorResponse = errorHandler.getErrorMsg(error);
+    const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
   }
 };

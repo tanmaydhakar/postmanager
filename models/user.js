@@ -1,4 +1,3 @@
-'use strict';
 const { Model } = require('sequelize');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -17,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init(
     {
-      user_name: {
+      username: {
         type: DataTypes.STRING(50),
         allowNull: false
       },
@@ -31,8 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       roles: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        default: ['user']
+        type: DataTypes.ARRAY(DataTypes.STRING)
       },
       tokens: {
         type: DataTypes.ARRAY(DataTypes.STRING)
@@ -44,10 +42,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  User.beforeCreate(function (model, options, cb) {
-    const encryptedPassword = bcrypt.hashSync(model.password, 10);
-    model.password = encryptedPassword;
-    return cb(null, options);
+  User.beforeCreate(function (model, options) {
+    return new Promise(resolve => {
+      const encryptedPassword = bcrypt.hashSync(model.password, 10);
+      model.password = encryptedPassword;
+      return resolve(null, options);
+    });
   });
 
   User.findBySpecificField = async function (fields) {
@@ -74,6 +74,29 @@ module.exports = (sequelize, DataTypes) => {
 
   User.generateAuthToken = async function () {
     return crypto.randomBytes(64).toString('hex');
+  };
+
+  User.manageAuthToken = async function (type, token, username) {
+    let query;
+
+    if (type === 'append') {
+      query = sequelize.fn('array_append', sequelize.col('tokens'), token);
+    } else if (type === 'remove') {
+      query = sequelize.fn('array_remove', sequelize.col('tokens'), token);
+    } else {
+      query = [];
+    }
+
+    await User.update(
+      {
+        tokens: query
+      },
+      {
+        where: {
+          username
+        }
+      }
+    );
   };
 
   return User;

@@ -4,7 +4,7 @@
   "description": "Social media post manager",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production nodemon",
+    "start": "NODE_ENV=development nodemon",
     "test": "mocha — timeout 10000"
   },
   "author": "tanmay",

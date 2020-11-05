@@ -7,6 +7,6 @@ const getErrorMessage = function (err) {
   return errResponse;
 };
 
-module.response = {
+module.exports = {
   getErrorMessage
 };

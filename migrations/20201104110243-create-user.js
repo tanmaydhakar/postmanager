@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      user_name: {
+      username: {
         type: Sequelize.STRING
       },
       email: {
@@ -18,10 +18,11 @@ module.exports = {
         type: Sequelize.TEXT
       },
       roles: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        defaultValue: ['user']
       },
       tokens: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
