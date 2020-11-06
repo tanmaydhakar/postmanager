@@ -7,8 +7,8 @@ const verifyToken = async function (req, res, next) {
   if (!req.headers.authorization) {
     return res.status(404).json({ message: 'Authorization header not provided' });
   }
-  const token = req.headers.authorization.split(' ')[1];
-  if (token) {
+  const token = req.headers.authorization;
+  if (!token) {
     return res.status(404).json({ message: 'Token not provided' });
   }
 

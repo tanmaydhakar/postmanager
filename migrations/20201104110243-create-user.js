@@ -22,7 +22,7 @@ module.exports = {
         defaultValue: ['user']
       },
       tokens: {
-        type: Sequelize.STRING
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       createdAt: {
         allowNull: false,

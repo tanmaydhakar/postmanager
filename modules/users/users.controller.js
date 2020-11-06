@@ -33,7 +33,7 @@ const login = async function (req, res) {
       throw err;
     } else {
       const token = await User.generateAuthToken();
-      await User.addAuthToken('append', token, user.username);
+      await User.manageAuthToken('append', token, user.username);
       return res.status(200).json({ token });
     }
   } catch (error) {
@@ -44,8 +44,8 @@ const login = async function (req, res) {
 
 const logout = async function (req, res) {
   try {
-    const token = req.headers.authorization.split(' ')[1];
-    await User.addAuthToken('remove', token, req.user.username);
+    const token = req.headers.authorization;
+    await User.manageAuthToken('remove', token, req.user.username);
     return res.status(200).json({ status: 'User loggedout successfully' });
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
