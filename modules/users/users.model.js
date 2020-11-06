@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.hasMany(models.Token, { as: 'token', foreignKey: 'user_id' });
+      this.hasMany(models.UserRole, { as: 'role', foreignKey: 'user_id' });
     }
   }
   User.init(
@@ -28,12 +29,6 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.TEXT,
         allowNull: false
-      },
-      roles: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-      },
-      tokens: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
       }
     },
     {
@@ -59,44 +54,8 @@ module.exports = (sequelize, DataTypes) => {
     return user;
   };
 
-  User.verifyToken = async function (token) {
-    const queryOptions = {
-      where: {
-        tokens: {
-          [Op.in]: token
-        }
-      }
-    };
-
-    const user = await User.findOne(queryOptions);
-    return user;
-  };
-
   User.generateAuthToken = async function () {
     return crypto.randomBytes(64).toString('hex');
-  };
-
-  User.manageAuthToken = async function (type, token, username) {
-    let query;
-
-    if (type === 'append') {
-      query = sequelize.fn('array_append', sequelize.col('tokens'), token);
-    } else if (type === 'remove') {
-      query = sequelize.fn('array_remove', sequelize.col('tokens'), token);
-    } else {
-      query = [];
-    }
-
-    await User.update(
-      {
-        tokens: query
-      },
-      {
-        where: {
-          username
-        }
-      }
-    );
   };
 
   return User;

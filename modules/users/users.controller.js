@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 
 const db = require(path.resolve('./models'));
 const errorHandler = require(path.resolve('./utilities/errorHandler'));
+const serializer = require(path.resolve('./modules/users/users.serializer'));
 const err = new Error();
-const { User } = db;
+const { User, Role, UserRole, Token } = db;
 
 const register = async function (req, res) {
   try {
@@ -13,7 +14,19 @@ const register = async function (req, res) {
     user.email = req.body.email;
     user.password = req.body.password;
     await user.save();
-    return res.status(200).json({ user });
+
+    const field = {
+      name: 'user'
+    };
+    const role = await Role.findBySpecificField(field);
+
+    const userRole = new UserRole();
+    userRole.user_id = user.id;
+    userRole.role_id = role.id;
+    await userRole.save();
+
+    const responseData = await serializer.registerUser(user);
+    return res.status(200).json({ user: responseData });
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
@@ -32,9 +45,14 @@ const login = async function (req, res) {
       err.message = 'Invalid username or password';
       throw err;
     } else {
-      const token = await User.generateAuthToken();
-      await User.manageAuthToken('append', token, user.username);
-      return res.status(200).json({ token });
+      const userToken = await User.generateAuthToken();
+      const token = new Token();
+      token.user_id = user.id;
+      token.token = userToken;
+      await token.save();
+
+      const responseData = await serializer.loginUser(user, userToken);
+      return res.status(200).json({ user: responseData });
     }
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
@@ -44,8 +62,9 @@ const login = async function (req, res) {
 
 const logout = async function (req, res) {
   try {
-    const token = req.headers.authorization;
-    await User.manageAuthToken('remove', token, req.user.username);
+    const userToken = req.headers.authorization;
+    await Token.destroyToken(userToken);
+
     return res.status(200).json({ status: 'User loggedout successfully' });
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
