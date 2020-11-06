@@ -1,6 +1,6 @@
 const path = require('path');
 
-const db = require(path.resolve('./models/index'));
+const db = require(path.resolve('./models'));
 const { body, validationResult } = require('express-validator');
 
 const { User } = db;
