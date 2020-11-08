@@ -12,21 +12,23 @@ const verifyToken = async function (req, res, next) {
     return res.status(404).json({ message: 'Token not provided' });
   }
 
-  const field = {
+  const where = {
     token: userToken
   };
-  const token = await Token.findBySpecificField(field);
-
+  let token = await Token.findOne({ where, include: [{ all: true, nested: true }] });
   if (!token) {
     return res.status(401).json({ message: 'Failed to authorize token' });
   }
-  let user = await token.getUser();
-  const userRole = await user.getRole();
-  user = user.toJSON();
-  user.token = userToken;
-  user.roles = userRole;
-  req.user = user;
+  token = token.toJSON();
+  const userDetails = {};
+  userDetails.id = token.user.id;
+  userDetails.username = token.user.username;
+  userDetails.email = token.user.email;
+  userDetails.password = token.user.password;
+  userDetails.role = token.user.userRole.role.name;
+  userDetails.token = token.token;
 
+  req.user = userDetails;
   return next();
 };
 
