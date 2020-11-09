@@ -13,6 +13,9 @@
   "rules": {
     "prettier/prettier": ["error"],
     "no-console": "off",
-    "no-undef": "off"
+    "no-undef": "off",
+    "import/no-dynamic-require": "off",
+    "func-names": "off",
+    "no-param-reassign": "off"
   }
 }

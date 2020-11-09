@@ -1,26 +1,27 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
-    "database": "smpm_development",
+    "username": "",
+    "password": "",
+    "database": "",
     "host": "127.0.0.1",
     "dialect": "postgres",
     "server_port": 5002
   },
   "test": {
-    "username": "root",
-    "password": null,
-    "database": "smpm_test",
+    "username": "",
+    "password": "",
+    "database": "",
     "host": "127.0.0.1",
     "dialect": "postgres",
     "server_port": 5002
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "smpm_production",
+    "username": "postgres",
+    "password": "",
+    "database": "",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "server_port": 5002
+    "server_port": 5002,
+    "logging": false
   }
 }
