@@ -21,6 +21,27 @@ const sendMail = async function (data, type) {
   };
   console.log(mailOptions);
 
+  if (type === 'Post Created') {
+    template = `<p>Dear User,<br /><br /></p>
+    <p>Your post has been successfully created.Following are your post details.<br /><br /><br /></p>
+    <table style="height: 177px;" width="469">
+    <tbody>
+    <tr>
+    <td style="width: 226px;">Message</td>
+    <td style="width: 227px;">${data.message}</td>
+    </tr>
+    <tr>
+    <td style="width: 226px;">Image</td>
+    <td style="width: 227px;">${data.image_url}</td>
+    </tr>
+    <tr>
+    <td style="width: 226px;">Schedule Date</td>
+    <td style="width: 227px;">${data.scheduled_date}</td>
+    </tr>
+    </tbody>
+    </table>`;
+  }
+
   if (template) {
     mailOptions.html = template;
   }

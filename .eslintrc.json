@@ -16,6 +16,7 @@
     "no-undef": "off",
     "import/no-dynamic-require": "off",
     "func-names": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "no-await-in-loop": "off"
   }
 }

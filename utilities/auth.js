@@ -32,6 +32,14 @@ const verifyToken = async function (req, res, next) {
   return next();
 };
 
+const isAdmin = async function (req, res, next) {
+  if (req.user.role === 'admin') {
+    return res.status(403).json({ message: 'You cant access this resource' });
+  }
+  return next();
+};
+
 module.exports = {
-  verifyToken
+  verifyToken,
+  isAdmin
 };

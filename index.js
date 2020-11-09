@@ -40,8 +40,16 @@ const setupRoutes = function () {
  * @returns {Promise} resolve - the success state of promise
  * */
 const setupSequelize = function () {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     require(path.resolve('./models'));
+    return resolve();
+  });
+};
+
+const initilize = function () {
+  return new Promise(resolve => {
+    const initialize = require(path.resolve('./init'));
+    initialize.initialize();
     return resolve();
   });
 };
@@ -62,9 +70,12 @@ const setupServer = function () {
     setupSequelizePromise.then(() => {
       const setupRoutesPromise = setupRoutes();
       setupRoutesPromise.then(expressRouter => {
-        app.use('/', expressRouter);
-        app.listen(process.env.server_port);
-        console.log(`SERVER STARTED ON PORT ${process.env.server_port}!`);
+        const initialize = initilize();
+        initialize.then(() => {
+          app.use('/', expressRouter);
+          app.listen(process.env.server_port);
+          console.log(`SERVER STARTED ON PORT ${process.env.server_port}!`);
+        });
       });
     });
   });
