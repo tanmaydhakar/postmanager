@@ -18,7 +18,10 @@
     "s3_access_key_id": "",
     "s3_secret_access_key": "",
     "s3_region": "",
-    "s3_bucket_name": ""
+    "s3_bucket_name": "",
+    "google_client_id": "",
+    "google_client_secret": "",
+    "hostname": ""
   },
   "test": {
     "username": "",
@@ -39,7 +42,10 @@
     "s3_access_key_id": "",
     "s3_secret_access_key": "",
     "s3_region": "",
-    "s3_bucket_name": ""
+    "s3_bucket_name": "",
+    "google_client_id": "",
+    "google_client_secret": "",
+    "hostname": ""
   },
   "production": {
     "username": "postgres",
@@ -61,6 +67,9 @@
     "s3_access_key_id": "",
     "s3_secret_access_key": "",
     "s3_region": "",
-    "s3_bucket_name": ""
+    "s3_bucket_name": "",
+    "google_client_id": "",
+    "google_client_secret": "",
+    "hostname": ""
   }
 }
