@@ -2,6 +2,7 @@ const path = require('path');
 
 const rules = require(path.resolve('./modules/posts/posts.validator'));
 const auth = require(path.resolve('./utilities/auth'));
+const fileUpload = require(path.resolve('./utilities/fileUpload'));
 const postController = require(path.resolve('./modules/posts/posts.controller'));
 
 module.exports = function (router) {
@@ -10,6 +11,7 @@ module.exports = function (router) {
     auth.verifyToken,
     rules.createRules,
     rules.verifyRules,
+    fileUpload.singleUploadToS3,
     postController.create
   );
 
@@ -36,14 +38,25 @@ module.exports = function (router) {
     auth.verifyToken,
     rules.updateRules,
     rules.verifyRules,
+    fileUpload.singleUploadToS3,
     postController.update
   );
 
   router.delete(
-    '/api/login',
+    '/api/post/:postId',
     auth.verifyToken,
     rules.destroyRules,
     rules.verifyRules,
     postController.destroy
+  );
+
+  router.get('/api/posts', auth.verifyToken, postController.index);
+
+  router.get(
+    '/api/post/:postId',
+    auth.verifyToken,
+    rules.showRules,
+    rules.verifyRules,
+    postController.show
   );
 };

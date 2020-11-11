@@ -29,7 +29,7 @@ const approveRules = [
       if (!post) {
         return Promise.reject(new Error('Invalid postId'));
       }
-      if (!post.status === 'Pending') {
+      if (post.status !== 'Pending') {
         return Promise.reject(new Error('Post cant be updated now'));
       }
       return true;
@@ -45,7 +45,7 @@ const rejectRules = [
       if (!post) {
         return Promise.reject(new Error('Invalid postId'));
       }
-      if (!post.status === 'Pending') {
+      if (post.status !== 'Pending') {
         return Promise.reject(new Error('Post cant be updated now'));
       }
       return true;
@@ -61,7 +61,7 @@ const updateRules = [
       if (!post) {
         return Promise.reject(new Error('Invalid postId'));
       }
-      if (!post.status === 'Pending' || !post.status === 'Scheduled') {
+      if (post.status !== 'Pending' && post.status !== 'Scheduled') {
         return Promise.reject(new Error('Post cant be updated now'));
       }
       return true;
@@ -89,8 +89,21 @@ const destroyRules = [
       if (!post) {
         return Promise.reject(new Error('Invalid postId'));
       }
-      if (!post.status === 'Pending' || !post.status === 'Scheduled') {
+      if (post.status !== 'Pending' || post.status !== 'Scheduled') {
         return Promise.reject(new Error('Post cant be updated now'));
+      }
+      return true;
+    })
+];
+
+const showRules = [
+  param('postId')
+    .exists()
+    .withMessage('postId does not exists')
+    .custom(async function (value) {
+      const post = await Post.findByPk(value);
+      if (!post) {
+        return Promise.reject(new Error('Invalid postId'));
       }
       return true;
     })
@@ -111,5 +124,6 @@ module.exports = {
   approveRules,
   rejectRules,
   updateRules,
-  destroyRules
+  destroyRules,
+  showRules
 };
