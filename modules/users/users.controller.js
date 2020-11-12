@@ -8,29 +8,24 @@ const err = new Error();
 const { User, Role, UserRole, Token } = db;
 
 const register = async function (req, res) {
-  try {
-    const user = new User();
-    user.username = req.body.username;
-    user.email = req.body.email;
-    user.password = req.body.password;
-    await user.save();
+  const user = new User();
+  user.username = req.body.username;
+  user.email = req.body.email;
+  user.password = req.body.password;
+  await user.save();
 
-    const field = {
-      name: 'user'
-    };
-    const role = await Role.findBySpecificField(field);
+  const field = {
+    name: 'user'
+  };
+  const role = await Role.findBySpecificField(field);
 
-    const userRole = new UserRole();
-    userRole.user_id = user.id;
-    userRole.role_id = role.id;
-    await userRole.save();
+  const userRole = new UserRole();
+  userRole.user_id = user.id;
+  userRole.role_id = role.id;
+  await userRole.save();
 
-    const responseData = await serializer.registerUser(user);
-    return res.status(200).json({ user: responseData });
-  } catch (error) {
-    const errorResponse = errorHandler.getErrorMessage(error);
-    return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
-  }
+  const responseData = await serializer.registerUser(user);
+  return res.status(200).json({ user: responseData });
 };
 
 const login = async function (req, res) {
@@ -61,15 +56,10 @@ const login = async function (req, res) {
 };
 
 const logout = async function (req, res) {
-  try {
-    const userToken = req.headers.authorization;
-    await Token.destroyToken(userToken);
+  const userToken = req.headers.authorization;
+  await Token.destroyToken(userToken);
 
-    return res.status(200).json({ status: 'User loggedout successfully' });
-  } catch (error) {
-    const errorResponse = errorHandler.getErrorMessage(error);
-    return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
-  }
+  return res.status(200).json({ status: 'User loggedout successfully' });
 };
 
 module.exports = {

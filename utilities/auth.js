@@ -8,13 +8,11 @@ const verifyToken = async function (req, res, next) {
     return res.status(404).json({ message: 'Authorization header not provided' });
   }
   const userToken = req.headers.authorization;
-  if (!userToken) {
-    return res.status(404).json({ message: 'Token not provided' });
-  }
 
   const where = {
     token: userToken
   };
+
   let token = await Token.findOne({ where, include: [{ all: true, nested: true }] });
   if (!token) {
     return res.status(401).json({ message: 'Failed to authorize token' });
@@ -32,6 +30,14 @@ const verifyToken = async function (req, res, next) {
   return next();
 };
 
+const isAdmin = async function (req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'You cant access this resource' });
+  }
+  return next();
+};
+
 module.exports = {
-  verifyToken
+  verifyToken,
+  isAdmin
 };
