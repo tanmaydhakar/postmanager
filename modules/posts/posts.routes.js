@@ -9,9 +9,9 @@ module.exports = function (router) {
   router.post(
     '/api/post',
     auth.verifyToken,
+    fileUpload.singleUploadToS3,
     rules.createRules,
     rules.verifyRules,
-    fileUpload.singleUploadToS3,
     postController.create
   );
 
@@ -36,9 +36,9 @@ module.exports = function (router) {
   router.patch(
     '/api/post/:postId',
     auth.verifyToken,
+    fileUpload.singleUploadToS3,
     rules.updateRules,
     rules.verifyRules,
-    fileUpload.singleUploadToS3,
     postController.update
   );
 

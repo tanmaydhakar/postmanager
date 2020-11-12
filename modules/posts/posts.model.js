@@ -41,15 +41,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  Post.findBySpecificField = async function (fields) {
-    const queryOptions = {
-      where: fields
-    };
-
-    const post = await Post.findOne(queryOptions);
-    return post;
-  };
-
   Post.updateStatus = async function (status, postId) {
     const post = await Post.findByPk(postId);
     post.status = status;

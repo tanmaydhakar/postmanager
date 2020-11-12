@@ -39,33 +39,23 @@ const create = async function (req, res) {
 };
 
 const approve = async function (req, res) {
-  try {
-    const post = await Post.findByPk(req.params.postId);
-    await schedule.schedulePost(post);
+  const post = await Post.findByPk(req.params.postId);
+  await schedule.schedulePost(post);
 
-    post.status = 'Scheduled';
-    await post.save();
+  post.status = 'Scheduled';
+  await post.save();
 
-    const responseData = await serializer.post(post);
-    return res.status(200).json({ post: responseData });
-  } catch (error) {
-    const errorResponse = errorHandler.getErrorMessage(error);
-    return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
-  }
+  const responseData = await serializer.post(post);
+  return res.status(200).json({ post: responseData });
 };
 
 const reject = async function (req, res) {
-  try {
-    const post = await Post.findByPk(req.params.postId);
-    post.status = 'Rejected';
-    await post.save();
+  const post = await Post.findByPk(req.params.postId);
+  post.status = 'Rejected';
+  await post.save();
 
-    const responseData = await serializer.post(post);
-    return res.status(200).json({ post: responseData });
-  } catch (error) {
-    const errorResponse = errorHandler.getErrorMessage(error);
-    return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
-  }
+  const responseData = await serializer.post(post);
+  return res.status(200).json({ post: responseData });
 };
 
 const update = async function (req, res) {
@@ -76,12 +66,15 @@ const update = async function (req, res) {
       throw err;
     }
     const post = await Post.findByPk(req.params.postId);
+    if (post.status === 'Scheduled') {
+      await Scheduled_post.destroyScheduledPost(post.id);
+    }
     post.message = req.body.message ? req.body.message : null;
     post.image_url = req.file ? req.file.location : null;
     post.scheduled_date = new Date(req.body.scheduled_date);
+    post.status = 'Pending';
     post.save();
 
-    await Scheduled_post.destroyScheduledPost(post.id);
     await schedule.schedulePost(post);
 
     const responseData = await serializer.post(post);
@@ -93,20 +86,18 @@ const update = async function (req, res) {
 };
 
 const destroy = async function (req, res) {
-  try {
-    const post = await Post.findByPk(req.params.postId);
+  const post = await Post.findByPk(req.params.postId);
+  if (post.status === 'Scheduled') {
     await Scheduled_post.destroyScheduledPost(post.id);
-    await post.destroy();
-
-    return res.status(200).json({ status: 'Post deleted successfully' });
-  } catch (error) {
-    const errorResponse = errorHandler.getErrorMessage(error);
-    return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
   }
+  await post.destroy();
+
+  return res.status(200).json({ status: 'Post deleted successfully' });
 };
 
 const show = async function (req, res) {
   try {
+    console.log(req);
     const post = await Post.findByPk(req.params.postId);
     if (req.user.role === 'admin' || req.user.id === post.user_id) {
       const responseData = await serializer.post(post);
@@ -122,19 +113,15 @@ const show = async function (req, res) {
 };
 
 const index = async function (req, res) {
-  try {
-    if (req.user.role === 'admin') {
-      const posts = await Post.findAll();
-      return res.status(200).json({ posts });
-    }
-    const posts = await Post.findAll({ where: { user_id: req.user.id } });
-
+  if (req.user.role === 'admin') {
+    const posts = await Post.findAll();
     const responseData = await serializer.index(posts);
     return res.status(200).json({ posts: responseData });
-  } catch (error) {
-    const errorResponse = errorHandler.getErrorMessage(error);
-    return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
   }
+  const posts = await Post.findAll({ where: { user_id: req.user.id } });
+
+  const responseData = await serializer.index(posts);
+  return res.status(200).json({ posts: responseData });
 };
 
 module.exports = {

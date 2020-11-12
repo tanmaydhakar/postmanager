@@ -89,7 +89,7 @@ const destroyRules = [
       if (!post) {
         return Promise.reject(new Error('Invalid postId'));
       }
-      if (post.status !== 'Pending' || post.status !== 'Scheduled') {
+      if (post.status !== 'Pending' && post.status !== 'Scheduled') {
         return Promise.reject(new Error('Post cant be updated now'));
       }
       return true;
