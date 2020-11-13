@@ -28,15 +28,15 @@ const sendMail = async function (data, type) {
     <tbody>
     <tr>
     <td style="width: 226px;">Message</td>
-    <td style="width: 227px;">${data.message}</td>
+    <td style="width: 227px;">${data.post.message}</td>
     </tr>
     <tr>
     <td style="width: 226px;">Image</td>
-    <td style="width: 227px;">${data.image_url}</td>
+    <td style="width: 227px;">${data.post.image_url}</td>
     </tr>
     <tr>
     <td style="width: 226px;">Schedule Date</td>
-    <td style="width: 227px;">${data.scheduled_date}</td>
+    <td style="width: 227px;">${data.post.scheduled_date}</td>
     </tr>
     </tbody>
     </table>`;

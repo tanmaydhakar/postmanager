@@ -8,6 +8,7 @@ const mail = require(path.resolve('./utilities/mail'));
 const err = new Error();
 const { Post } = db;
 const { Scheduled_post } = db;
+const postStatus = ['Pending', 'Scheduled', 'Rejected', 'Posted', 'Error'];
 
 const create = async function (req, res) {
   try {
@@ -24,14 +25,14 @@ const create = async function (req, res) {
     post.user_id = req.user.id;
     await post.save();
 
+    const responseData = await serializer.post(post);
+    res.status(201).json({ post: responseData });
+
     const mailData = {};
     mailData.to = [req.user.email];
     mailData.subject = 'Your post has been created successfully!';
     mailData.post = post;
-    await mail.sendMail(mailData, 'Post Created');
-
-    const responseData = await serializer.post(post);
-    return res.status(201).json({ post: responseData });
+    return mail.sendMail(mailData, 'Post Created');
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
@@ -66,19 +67,19 @@ const update = async function (req, res) {
       throw err;
     }
     const post = await Post.findByPk(req.params.postId);
-    if (post.status === 'Scheduled') {
-      await Scheduled_post.destroyScheduledPost(post.id);
-    }
+
     post.message = req.body.message ? req.body.message : null;
     post.image_url = req.file ? req.file.location : null;
     post.scheduled_date = new Date(req.body.scheduled_date);
     post.status = 'Pending';
     post.save();
 
-    await schedule.schedulePost(post);
-
     const responseData = await serializer.post(post);
-    return res.status(200).json({ post: responseData });
+    res.status(200).json({ post: responseData });
+    if (post.status === 'Scheduled') {
+      return Scheduled_post.destroyScheduledPost(post.id);
+    }
+    return post;
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
@@ -87,17 +88,17 @@ const update = async function (req, res) {
 
 const destroy = async function (req, res) {
   const post = await Post.findByPk(req.params.postId);
+
+  await post.destroy();
+
+  res.status(200).json({ status: 'Post deleted successfully' });
   if (post.status === 'Scheduled') {
     await Scheduled_post.destroyScheduledPost(post.id);
   }
-  await post.destroy();
-
-  return res.status(200).json({ status: 'Post deleted successfully' });
 };
 
 const show = async function (req, res) {
   try {
-    console.log(req);
     const post = await Post.findByPk(req.params.postId);
     if (req.user.role === 'admin' || req.user.id === post.user_id) {
       const responseData = await serializer.post(post);
@@ -113,12 +114,22 @@ const show = async function (req, res) {
 };
 
 const index = async function (req, res) {
-  if (req.user.role === 'admin') {
-    const posts = await Post.findAll();
-    const responseData = await serializer.index(posts);
-    return res.status(200).json({ posts: responseData });
+  const whereStatement = {};
+  let sortBy;
+  if (req.query.status && postStatus.includes(req.query.status)) {
+    whereStatement.status = req.query.status;
   }
-  const posts = await Post.findAll({ where: { user_id: req.user.id } });
+
+  if (req.query.sort === 'message') {
+    sortBy = 'message asc';
+  } else {
+    sortBy = 'scheduled_date dec';
+  }
+
+  if (req.user.role !== 'admin') {
+    whereStatement.user_id = req.user.id;
+  }
+  const posts = await Post.findAll({ where: whereStatement }, { order: sortBy });
 
   const responseData = await serializer.index(posts);
   return res.status(200).json({ posts: responseData });
