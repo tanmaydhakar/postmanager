@@ -19,7 +19,6 @@ const sendMail = async function (data, type) {
     subject: data.subject || '',
     text: data.text || ''
   };
-  console.log(mailOptions);
 
   if (type === 'Post Created') {
     template = `<p>Dear User,<br /><br /></p>
