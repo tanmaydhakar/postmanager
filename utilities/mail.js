@@ -19,7 +19,6 @@ const sendMail = async function (data, type) {
     subject: data.subject || '',
     text: data.text || ''
   };
-  console.log(mailOptions);
 
   if (template) {
     mailOptions.html = template;
