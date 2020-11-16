@@ -1,4 +1,5 @@
 const { Model } = require('sequelize');
+const path = require('path');
 
 module.exports = (sequelize, DataTypes) => {
   class Post extends Model {
@@ -40,6 +41,33 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'Post'
     }
   );
+
+  Post.afterCreate(async post => {
+    const mail = require(path.resolve('./utilities/mail'));
+
+    mail.sendMail(post, 'Post Created');
+  });
+
+  Post.afterUpdate(async post => {
+    if (post._previousDataValues.status === 'Pending' && post.dataValues.status === 'Scheduled') {
+      const schedule = require(path.resolve('./utilities/schedulePost'));
+      await schedule.schedulePost(post);
+    } else if (post._previousDataValues.status === 'Scheduled') {
+      const db = require(path.resolve('./models'));
+      const { Scheduled_post } = db;
+
+      Scheduled_post.destroyScheduledPost(post.id);
+    }
+  });
+
+  Post.afterDestroy(async post => {
+    if (post._previousDataValues.status === 'Scheduled') {
+      const db = require(path.resolve('./models'));
+      const { Scheduled_post } = db;
+
+      Scheduled_post.destroyScheduledPost(post.id);
+    }
+  });
 
   Post.updateStatus = async function (status, postId) {
     const post = await Post.findByPk(postId);

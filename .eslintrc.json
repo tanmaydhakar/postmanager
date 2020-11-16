@@ -17,6 +17,8 @@
     "import/no-dynamic-require": "off",
     "func-names": "off",
     "no-param-reassign": "off",
-    "no-await-in-loop": "off"
+    "no-await-in-loop": "off",
+    "no-underscore-dangle": "off",
+    "global-require": "off"
   }
 }

@@ -33,7 +33,7 @@ const verifyToken = async function (req, res, next) {
 };
 
 const isAdmin = async function (req, res, next) {
-  if (req.user.role === 'admin') {
+  if (req.user.role !== 'admin') {
     return res.status(403).json({ message: 'You cant access this resource' });
   }
   return next();

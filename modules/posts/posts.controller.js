@@ -3,11 +3,8 @@ const path = require('path');
 const db = require(path.resolve('./models'));
 const errorHandler = require(path.resolve('./utilities/errorHandler'));
 const serializer = require(path.resolve('./modules/posts/posts.serializer'));
-const schedule = require(path.resolve('./utilities/schedulePost'));
-const mail = require(path.resolve('./utilities/mail'));
 const err = new Error();
 const { Post } = db;
-const { Scheduled_post } = db;
 const postStatus = ['Pending', 'Scheduled', 'Rejected', 'Posted', 'Error'];
 
 const create = async function (req, res) {
@@ -26,13 +23,7 @@ const create = async function (req, res) {
     await post.save();
 
     const responseData = await serializer.post(post);
-    res.status(201).json({ post: responseData });
-
-    const mailData = {};
-    mailData.to = [req.user.email];
-    mailData.subject = 'Your post has been created successfully!';
-    mailData.post = post;
-    return mail.sendMail(mailData, 'Post Created');
+    return res.status(201).json({ post: responseData });
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
@@ -41,8 +32,6 @@ const create = async function (req, res) {
 
 const approve = async function (req, res) {
   const post = await Post.findByPk(req.params.postId);
-  await schedule.schedulePost(post);
-
   post.status = 'Scheduled';
   await post.save();
 
@@ -75,11 +64,7 @@ const update = async function (req, res) {
     post.save();
 
     const responseData = await serializer.post(post);
-    res.status(200).json({ post: responseData });
-    if (post.status === 'Scheduled') {
-      return Scheduled_post.destroyScheduledPost(post.id);
-    }
-    return post;
+    return res.status(200).json({ post: responseData });
   } catch (error) {
     const errorResponse = errorHandler.getErrorMessage(error);
     return res.status(errorResponse.statusCode).json({ message: errorResponse.message });
@@ -88,13 +73,9 @@ const update = async function (req, res) {
 
 const destroy = async function (req, res) {
   const post = await Post.findByPk(req.params.postId);
-
   await post.destroy();
 
   res.status(200).json({ status: 'Post deleted successfully' });
-  if (post.status === 'Scheduled') {
-    await Scheduled_post.destroyScheduledPost(post.id);
-  }
 };
 
 const show = async function (req, res) {
