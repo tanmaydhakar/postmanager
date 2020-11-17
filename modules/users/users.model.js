@@ -45,6 +45,20 @@ module.exports = (sequelize, DataTypes) => {
     });
   });
 
+  User.afterCreate(async user => {
+    const db = require(path.resolve('./models'));
+    const { Role, UserRole } = db;
+    const field = {
+      name: 'user'
+    };
+    const role = await Role.findBySpecificField(field);
+
+    const userRole = new UserRole();
+    userRole.user_id = user.id;
+    userRole.role_id = role.id;
+    await userRole.save();
+  });
+
   User.findBySpecificField = async function (fields) {
     const queryOptions = {
       where: fields

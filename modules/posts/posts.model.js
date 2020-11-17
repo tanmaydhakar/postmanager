@@ -50,9 +50,15 @@ module.exports = (sequelize, DataTypes) => {
 
   Post.afterUpdate(async post => {
     if (post._previousDataValues.status === 'Pending' && post.dataValues.status === 'Scheduled') {
+      if (new Date(post.dataValues.scheduled_date).getTime() < new Date().getTime()) {
+        return Post.updateStatus('Error', post.dataValues.id);
+      }
       const schedule = require(path.resolve('./utilities/schedulePost'));
       await schedule.schedulePost(post);
-    } else if (post._previousDataValues.status === 'Scheduled') {
+    } else if (
+      post._previousDataValues.status === 'Scheduled' &&
+      post.dataValues.status !== 'Error'
+    ) {
       const db = require(path.resolve('./models'));
       const { Scheduled_post } = db;
 
