@@ -12,7 +12,13 @@
     "email_secure": false,
     "email_id": "",
     "email_pass": "",
-    "email_from": "Postmanager"
+    "email_from": "Postmanager",
+    "facebook_pageid": "",
+    "facebook_page_access_token": "",
+    "s3_access_key_id": "",
+    "s3_secret_access_key": "",
+    "s3_region": "",
+    "s3_bucket_name": ""
   },
   "test": {
     "username": "",
@@ -27,7 +33,13 @@
     "email_secure": "",
     "email_id": "",
     "email_pass": "",
-    "email_from": "Postmanager"
+    "email_from": "Postmanager",
+    "facebook_pageid": "",
+    "facebook_page_access_token": "",
+    "s3_access_key_id": "",
+    "s3_secret_access_key": "",
+    "s3_region": "",
+    "s3_bucket_name": ""
   },
   "production": {
     "username": "postgres",
@@ -43,6 +55,12 @@
     "email_id": "",
     "email_pass": "",
     "email_from": "Postmanager",
-    "logging": false
+    "logging": false,
+    "facebook_pageid": "",
+    "facebook_page_access_token": "",
+    "s3_access_key_id": "",
+    "s3_secret_access_key": "",
+    "s3_region": "",
+    "s3_bucket_name": ""
   }
 }
