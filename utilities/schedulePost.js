@@ -46,7 +46,7 @@ const reschedulePosts = async function () {
   if (posts.length) {
     for (let i = 0; i <= posts.length - 1; i += 1) {
       if (new Date(posts[i].scheduled_date) <= new Date()) {
-        Post.updateStatus('Error', post.id);
+        Post.updateStatus('Error', posts[i].id);
       } else {
         await schedulePost(posts[i]);
       }

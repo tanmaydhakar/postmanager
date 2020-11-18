@@ -46,7 +46,7 @@ const setupSequelize = function () {
   });
 };
 
-const initilize = function () {
+const initialize = function () {
   return new Promise(resolve => {
     const initialize = require(path.resolve('./init'));
     initialize.initialize();
@@ -70,8 +70,8 @@ const setupServer = function () {
     setupSequelizePromise.then(() => {
       const setupRoutesPromise = setupRoutes();
       setupRoutesPromise.then(expressRouter => {
-        const initialize = initilize();
-        initialize.then(() => {
+        const initializePromise = initialize();
+        initializePromise.then(() => {
           app.use('/', expressRouter);
           app.listen(process.env.server_port);
           console.log(`SERVER STARTED ON PORT ${process.env.server_port}!`);
