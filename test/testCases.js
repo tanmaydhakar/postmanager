@@ -45,15 +45,17 @@ const registerUser = function () {
   });
 };
 
-const loginUser = function (username, password) {
+const getUserToken = function () {
   return new Promise(resolve => {
-    chai
-      .request(apiBase)
-      .post('/api/login')
-      .send({ username, password })
-      .then(res => {
-        return resolve(res.body.user);
-      });
+    registerUser().then(user => {
+      chai
+        .request(apiBase)
+        .post('/api/login')
+        .send({ username: user.username, password: 'User@123abc' })
+        .then(res => {
+          return resolve(res.body.user);
+        });
+    });
   });
 };
 
@@ -259,11 +261,9 @@ describe('# Project APIs', () => {
   describe('Post apis testing', () => {
     let userToken;
     before(function (done) {
-      registerUser().then(registeredUser => {
-        loginUser(registeredUser.username, password).then(user => {
-          userToken = user.token;
-          done();
-        });
+      getUserToken().then(user => {
+        userToken = user.token;
+        done();
       });
     });
 
@@ -326,13 +326,9 @@ describe('# Project APIs', () => {
     let userToken;
     let postResponse;
     before(function (done) {
-      const registerUserPromise = registerUser;
-      registerUserPromise().then(registeredUser => {
-        const loginUserPromise = loginUser;
-        loginUserPromise(registeredUser.username, password).then(user => {
-          userToken = user.token;
-          done();
-        });
+      getUserToken().then(user => {
+        userToken = user.token;
+        done();
       });
     });
 
@@ -416,7 +412,6 @@ describe('# Project APIs', () => {
         .attach('image', './test/tree.jpg', 'tree.jpg')
         .field(data)
         .then(res => {
-          console.log(res.text);
           expect(res.statusCode).to.equal(201);
           expect(res.body).to.have.property('post');
           expect(res.body.post).to.have.property('id');
@@ -481,13 +476,9 @@ describe('# Project APIs', () => {
 
     describe('Fail: gets a specific post that does not belongs to that user', () => {
       before(function (done) {
-        const registerUserPromise = registerUser;
-        registerUserPromise().then(registeredUser => {
-          const loginUserPromise = loginUser;
-          loginUserPromise(registeredUser.username, password).then(user => {
-            userToken = user.token;
-            done();
-          });
+        getUserToken().then(user => {
+          userToken = user.token;
+          done();
         });
       });
 
@@ -604,26 +595,22 @@ describe('# Project APIs', () => {
 
   describe('checking update post apis', () => {
     let postResponse;
-    before(done => {
-      const registerUserPromise = registerUser;
-      registerUserPromise().then(registeredUser => {
-        const loginUserPromise = loginUser;
-        loginUserPromise(registeredUser.username, password).then(user => {
-          userToken = user.token;
-          const data = {
-            scheduled_date: tomorrowDate.toString(),
-            message: faker.random.words(10)
-          };
-          chai
-            .request(apiBase)
-            .post('/api/post')
-            .set('Authorization', userToken)
-            .send(data)
-            .then(res => {
-              postResponse = res.body;
-              done();
-            });
-        });
+    before(function (done) {
+      getUserToken().then(user => {
+        userToken = user.token;
+        const data = {
+          scheduled_date: tomorrowDate.toString(),
+          message: faker.random.words(10)
+        };
+        chai
+          .request(apiBase)
+          .post('/api/post')
+          .set('Authorization', userToken)
+          .send(data)
+          .then(res => {
+            postResponse = res.body;
+            done();
+          });
       });
     });
 
@@ -857,14 +844,10 @@ describe('# Project APIs', () => {
 
   describe('logout user', () => {
     let userToken;
-    before(done => {
-      const registerUserPromise = registerUser;
-      registerUserPromise().then(registeredUser => {
-        const loginUserPromise = loginUser;
-        loginUserPromise(registeredUser.username, password).then(user => {
-          userToken = user.token;
-          done();
-        });
+    before(function (done) {
+      getUserToken().then(user => {
+        userToken = user.token;
+        done();
       });
     });
 
