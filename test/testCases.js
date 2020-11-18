@@ -416,6 +416,7 @@ describe('# Project APIs', () => {
         .attach('image', './test/tree.jpg', 'tree.jpg')
         .field(data)
         .then(res => {
+          console.log(res.text);
           expect(res.statusCode).to.equal(201);
           expect(res.body).to.have.property('post');
           expect(res.body.post).to.have.property('id');
@@ -764,6 +765,28 @@ describe('# Project APIs', () => {
           .send(data)
           .then(res => {
             postResponse = res.body;
+            done();
+          });
+      });
+
+      it('Success: creates a post with image', done => {
+        const data = {
+          scheduled_date: tomorrowDate.toString()
+        };
+        chai
+          .request(apiBase)
+          .patch(`/api/post/${postResponse.post.id}`)
+          .set('Authorization', userToken)
+          .attach('image', './test/tree.jpg', 'tree.jpg')
+          .field(data)
+          .then(res => {
+            expect(res.statusCode).to.equal(200);
+            expect(res.body).to.have.property('post');
+            expect(res.body.post).to.have.property('id');
+            expect(res.body.post).to.have.property('message').to.equal(null);
+            expect(res.body.post).to.have.property('image_url');
+            expect(res.body.post).to.have.property('status').to.equal('Pending');
+            expect(res.body.post).to.have.property('scheduled_date');
             done();
           });
       });
