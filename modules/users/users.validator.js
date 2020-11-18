@@ -33,7 +33,6 @@ const registerRules = [
     .withMessage('email does not exists')
     .isEmail()
     .withMessage('Invalid email format')
-    .normalizeEmail()
     .trim()
     .custom(value => {
       const field = {
