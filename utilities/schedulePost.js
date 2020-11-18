@@ -9,13 +9,15 @@ const { Scheduled_post } = db;
 const schedulePost = async function (post) {
   const queryData = {};
   queryData.message = post.message ? post.message : undefined;
-  queryData.url = post.imageUrl ? post.imageUrl : undefined;
-  queryData.access_token = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  queryData.url = post.image_url ? post.image_url : undefined;
+  queryData.access_token = process.env.facebook_page_access_token;
 
   const job = schedule.scheduleJob(post.scheduled_date, function () {
     axios({
       method: 'post',
-      url: `https://graph.facebook.com/${process.env.facebook_pageid}/feed`,
+      url: `https://graph.facebook.com/${process.env.facebook_pageid}/${
+        queryData.url ? 'photos' : 'feed'
+      }`,
       data: queryData
     })
       .then(() => {
