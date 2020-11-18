@@ -285,6 +285,24 @@ describe('# Project APIs', () => {
         });
     });
 
+    it('Success: gets all posts for user', done => {
+      chai
+        .request(apiBase)
+        .get('/api/posts?status=Posted&sort=message')
+        .set('Authorization', userToken)
+        .then(res => {
+          expect(res.statusCode).to.equal(200);
+          expect(res.body).to.have.property('posts');
+          expect(res.body.posts).to.satisfy(posts => {
+            if (Array.isArray(posts)) {
+              return true;
+            }
+            return false;
+          });
+          done();
+        });
+    });
+
     it('Success: gets all posts for admin', done => {
       chai
         .request(apiBase)
@@ -606,6 +624,22 @@ describe('# Project APIs', () => {
             });
         });
       });
+    });
+
+    it('Fail: creates a post without message', done => {
+      const data = {
+        scheduled_date: tomorrowDate.toString()
+      };
+      chai
+        .request(apiBase)
+        .patch(`/api/post/${postResponse.post.id}`)
+        .set('Authorization', userToken)
+        .send(data)
+        .then(res => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body).to.have.property('message').to.equal('Post cant be empty');
+          done();
+        });
     });
 
     it('Fail: update a post with invalid scheduled_date', done => {
