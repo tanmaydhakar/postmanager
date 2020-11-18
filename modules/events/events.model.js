@@ -43,5 +43,11 @@ module.exports = (sequelize, DataTypes) => {
     return event;
   };
 
+  Event.updateStatus = async function (eventId, status) {
+    const event = await Event.findByPk(eventId);
+    event.status = status;
+    await event.save();
+  };
+
   return Event;
 };

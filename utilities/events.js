@@ -44,16 +44,9 @@ const scheduleEventMails = async function (eventData) {
         emailsArray.push(emails[i].email);
       }
       if (emailsArray.length) {
-        const mailData = {};
-        mailData.to = emailsArray;
-        mailData.subject = 'Here are the details for upcoming event!';
-        mailData.event = eventData;
-
-        await mail.sendMail(mailData, 'Event');
-
-        const event = Event.findByPk(eventData.id);
-        event.status = 'Mailed';
-        await event.save();
+        eventData.emailsArray = emailsArray;
+        await mail.sendMail(eventData, 'Event');
+        await Event.updateStatus(eventData.id, 'Mailed');
       }
     }
   );

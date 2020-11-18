@@ -34,20 +34,26 @@ const sendMail = async function (data, type) {
     <tbody>
     <tr>
     <td style="width: 226px;">Message</td>
-    <td style="width: 227px;">${data.post.message}</td>
+    <td style="width: 227px;">${data.message}</td>
     </tr>
     <tr>
     <td style="width: 226px;">Image</td>
-    <td style="width: 227px;">${data.post.image_url}</td>
+    <td style="width: 227px;">${data.image_url}</td>
     </tr>
     <tr>
     <td style="width: 226px;">Schedule Date</td>
-    <td style="width: 227px;">${data.post.scheduled_date}</td>
+    <td style="width: 227px;">${data.scheduled_date}</td>
     </tr>
     </tbody>
     </table>`;
   }
   if (type === 'Event') {
+    mailOptions = {
+      from: process.env.email_from,
+      to: data.emailsArray.join(),
+      subject: 'Here are the details for upcoming event!',
+      text: ''
+    };
     template = `<p>Here are the details for the upcoming event.<br><br></p>
     <table style="width: 100%;">
         <tbody>
