@@ -5,7 +5,33 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=development nodemon",
-    "test": "mocha — timeout 10000"
+    "test": "mocha ./test/testCases.js --timeout 30000 --exit",
+    "cover": "NODE_ENV=development nyc --reporter=lcov --reporter=html --reporter=text npm run test"
+  },
+  "nyc": {
+    "include-all-sources": true,
+    "register": "babel-register",
+    "all": true,
+    "exclude": [
+      "test",
+      "seeders",
+      "index.js",
+      "init.js",
+      "models.js",
+      "routes.js",
+      "coverage",
+      "migrations",
+      "modules/events",
+      "modules/roles",
+      "modules/scheduledPosts",
+      "modules/tokens",
+      "modules/userRoles",
+      "modules/*/*.routes.js",
+      "modules/*/*.routes.js",
+      "utilities/events.js",
+      "utilities/fileUpload.js",
+      "utilities/schedulePost.js"
+    ]
   },
   "author": "tanmay",
   "license": "ISC",
@@ -39,6 +65,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "faker": "^5.1.0",
     "mocha": "^8.2.1",
+    "nyc": "^15.1.0",
     "prettier": "^2.1.2",
     "sequelize-cli": "^6.2.0"
   }
